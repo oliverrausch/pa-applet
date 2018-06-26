@@ -2,7 +2,6 @@
  * This file is part of pa-applet.
  *
  * © 2012 Fernando Tarlá Cardoso Lemos
- *
  * Refer to the LICENSE file for licensing information.
  *
  */
@@ -72,13 +71,22 @@ void notifications_flash(void)
     // Update the notification volume
     notify_notification_set_hint_int32(notification, "value", (gint)as->volume);
 
-    // Update the notification icon
+    // Update the notification icon and text
 	char* string;
-	if (0 > asprintf(&string, "Volume: %d", as->volume))
-		notify_notification_update(notification, PROGRAM_NAME, NULL, icon_name);
-	else {
-    	notify_notification_update(notification, string, NULL, icon_name);
-		free(string);
+	if (as->muted){
+		if (0 > asprintf(&string, "Volume: %.0f%% (muted)", as->volume))
+			notify_notification_update(notification, "asprintf failed", NULL, icon_name);
+		else {
+			notify_notification_update(notification, string, NULL, icon_name);
+			free(string);
+		}
+	} else {
+		if (0 > asprintf(&string, "Volume: %.0f%%", as->volume))
+			notify_notification_update(notification, "asprintf failed", NULL, icon_name);
+		else {
+			notify_notification_update(notification, string, NULL, icon_name);
+			free(string);
+		}
 	}
 
     // Show the notification
